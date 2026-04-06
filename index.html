@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Biodinámico</title>
+    <style>
+        :root {
+            --primary: #2d6a4f;
+            --accent: #d4a373;
+            --bg: #f1f3f2;
+            --card: #ffffff;
+            --text: #1b4332;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            color: var(--primary);
+        }
+
+        /* Layout de dos columnas */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .section {
+            background: rgba(255,255,255,0.5);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #e0e6e3;
+        }
+
+        h2 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-top: 0;
+            text-align: center;
+        }
+
+        /* Grid de Lunas */
+        .moon-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .moon-card {
+            background: var(--card);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .moon-card:hover { transform: translateY(-3px); }
+        .moon-card.active { border-color: var(--accent); background: #fffcf9; }
+
+        .moon-card img { width: 40px; height: 40px; display: block; margin: 0 auto 5px; }
+        .moon-card span { font-size: 11px; font-weight: 700; }
+
+        /* Grid de Meses */
+        .month-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .month-btn {
+            background: var(--card);
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--primary);
+            transition: 0.2s;
+        }
+
+        .month-btn:hover { background: #e9edc9; }
+        .month-btn.active { background: var(--primary); color: white; }
+
+        /* Paneles de Resultado */
+        .result-panel {
+            background: var(--card);
+            padding: 15px;
+            border-radius: 12px;
+            min-height: 100px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--accent);
+        }
+
+        .result-title { font-weight: 700; margin-bottom: 8px; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .result-text { font-size: 14px; line-height: 1.4; color: #444; }
+
+        .plant-chip {
+            display: inline-block;
+            background: #f1f8f4;
+            color: #2d6a4f;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin: 2px;
+            border: 1px solid #d8e6df;
+        }
+
+        /* Responsive */
+        @media (max-width: 850px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .moon-selector { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        @media (max-width: 480px) {
+            .moon-selector { grid-template-columns: repeat(2, 1fr); }
+            .month-selector { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Huerta Biodinámica</h1>
+
+    <div class="main-grid">
+        
+        <div class="section">
+            <h2>Ciclo Lunar</h2>
+            <div class="moon-selector">
+                <div class="moon-card" onclick="setMoon(this, 'Luna Nueva')">
+                    <img src="nueva.PNG" alt="N"><span>Nueva</span>
+                </div>
+                <div class="moon-card" onclick="setMoon(this, 'Cuarto Creciente')">
+                    <img src="creciente.PNG" alt="C"><span>Creciente</span>
+                </div>
+                <div class="moon-card" onclick="setMoon(this, 'Luna Llena')">
+                    <img src="llena.PNG" alt="L"><span>Llena</span>
+                </div>
+                <div class="moon-card" onclick="setMoon(this, 'Cuarto Menguante')">
+                    <img src="menguante.PNG" alt="M"><span>Menguante</span>
+                </div>
+            </div>
+            <div class="result-panel" id="resLuna">
+                <div class="result-title">Influencia Lunar</div>
+                <div class="result-text">Seleccioná una fase para ver las tareas recomendadas.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Calendario de Siembra</h2>
+            <div class="month-selector" id="monthGrid">
+                </div>
+            <div class="result-panel" id="resMes" style="border-top-color: var(--primary);">
+                <div class="result-title">Siembra del Mes</div>
+                <div class="result-text">Seleccioná un mes para ver qué sembrar.</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const lunas = {
+        'Luna Nueva': "La savia baja a las raíces. Ideal para desmalezar, podar plantas enfermas y limpiar el terreno. Evitar siembras delicadas.",
+        'Cuarto Creciente': "La savia comienza a subir. Momento de gran fertilidad. Sembrar plantas de hoja (lechuga, acelga) y aplicar abonos líquidos.",
+        'Luna Llena': "Máxima concentración de savia en las partes aéreas. Cosechar frutos para consumo inmediato. Ideal para trasplantes y voltear compost.",
+        'Cuarto Menguante': "La energía se dirige hacia abajo. Momento perfecto para sembrar raíces (zanahoria, remolacha) y tubérculos (papa). Buen momento para injertos."
+    };
+
+    const meses = {
+        'Enero': "Apio, Choclo, Hinojo, Papa, Zanahoria, Zapallito, Zuccini",
+        'Febrero': "Acelga, Apio, Brócoli, Coliflor, Verdeo, Chaucha, Espinaca, Hinojo, Lechuga, Papa, Perejil, Puerro, Rabanito, Zanahoria",
+        'Marzo': "Acelga, Ajo, Apio, Arveja, Brócoli, Coliflor, Verdeo, Espinaca, Haba, Hinojo, Perejil, Puerro, Remolacha, Repollo, Zanahoria",
+        'Abril': "Acelga, Ajo, Arveja, Brócoli, Coliflor, Verdeo, Espinaca, Frutilla, Haba, Puerro, Radicheta, Remolacha, Zanahoria",
+        'Mayo': "Acelga, Ajo, Arveja, Chaucha, Espinaca, Frutilla, Haba, Radicheta, Remolacha, Zanahoria",
+        'Junio': "Acelga, Arveja, Espinaca, Haba, Rabanito, Remolacha, Zanahoria",
+        'Julio': "Arveja, Batata, Berenjena, Lechuga, Pimiento, Tomate, Zanahoria",
+        'Agosto': "Albahaca, Arveja, Batata, Berenjena, Choclo, Espárragos, Melón, Sandía, Papa, Pepino, Tomate, Zapallo",
+        'Septiembre': "Albahaca, Berenjena, Choclo, Espárragos, Lechuga, Melón, Sandía, Papa, Pepino, Perejil, Pimiento, Tomate",
+        'Octubre': "Acelga, Albahaca, Berenjena, Brócoli, Chaucha, Choclo, Melón, Sandía, Pepino, Perejil, Rabanito, Zapallo",
+        'Noviembre': "Acelga, Albahaca, Chaucha, Choclo, Lechuga, Pepino, Rabanito, Remolacha, Repollo, Zanahoria, Zapallo",
+        'Diciembre': "Acelga, Apio, Choclo, Rabanito, Remolacha, Zanahoria, Zapallito, Zuccini"
+    };
+
+    // Generar botones de meses
+    const monthGrid = document.getElementById('monthGrid');
+    Object.keys(meses).forEach(m => {
+        const btn = document.createElement('button');
+        btn.className = 'month-btn';
+        btn.innerText = m;
+        btn.onclick = (e) => setMonth(e.target, m);
+        monthGrid.appendChild(btn);
+    });
+
+    function setMoon(el, key) {
+        document.querySelectorAll('.moon-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('resLuna').innerHTML = `
+            <div class="result-title">🌕 ${key}</div>
+            <div class="result-text">${lunas[key]}</div>
+        `;
+    }
+
+    function setMonth(el, key) {
+        document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        const plants = meses[key].split(', ').map(p => `<span class="plant-chip">${p}</span>`).join('');
+        document.getElementById('resMes').innerHTML = `
+            <div class="result-title">📅 Siembra de ${key}</div>
+            <div class="result-text">${plants}</div>
+        `;
+    }
+</script>
+
+</body>
+</html>
